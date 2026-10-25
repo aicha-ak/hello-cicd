@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,28 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Compiler et tester
+      - name: Executer les tests
+        run: mvn -B test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Construire le JAR
         run: mvn -B clean package
+
+      - name: Sauvegarder le JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-java
+          path: target/*.jar
